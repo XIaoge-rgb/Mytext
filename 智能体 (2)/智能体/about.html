@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于我们</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei,sans-serif}
+body{background:#1a1a1a;color:#fff;line-height:1.6}
+nav{background:#222;padding:18px 30px;position:sticky;top:0;z-index:99}
+.nav-box{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.nav-left{display:flex;gap:20px;flex-wrap:wrap}
+nav a{color:#fff;text-decoration:none;font-size:16px}
+nav a:hover{color:#409eff}
+.btn-login{background:#409eff;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer}
+.container{max-width:1200px;margin:40px auto;padding:0 20px}
+
+/* 整体布局：左右并排 */
+.row {
+  display: flex;
+  gap: 30px; /* 左右模块之间的间距 */
+  margin-bottom: 25px;
+  align-items: flex-start; /* 保持顶部对齐 */
+}
+
+/* 左侧：视频模块（黑色框左靠+加长） */
+.col-left {
+  flex: 1; /* 占一半宽度 */
+  background:#2a2a2a;
+  padding: 40px 30px; /* 上下内边距加大，视觉更长 */
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  min-height: 600px; /* 最小高度，强制拉长框体 */
+}
+
+/* 右侧：理念模块（黑色框右靠+加长，和左侧等高） */
+.col-right {
+  flex: 1; /* 占一半宽度 */
+  background:#2a2a2a;
+  padding: 40px 30px; /* 上下内边距和左侧一致 */
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  min-height: 600px; /* 和左侧同高，视觉对称 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 内容垂直居中，避免框长内容空 */
+}
+
+/* 视频自适应大小 */
+.video-wrap {
+  width: 50%;
+  margin: 25px 0;
+}
+.video-wrap video {
+  width: 100%;
+  height: auto; /* 高度自动，不变形 */
+  border-radius:8px;
+  object-fit: cover;
+  min-height: 350px; /* 视频同步拉长，和框体匹配 */
+}
+
+/* 标题字号加大，和长框匹配 */
+.col-left h2, .col-right h2 {
+  font-size: 28px;
+  color: #409eff; /* 加主题色，更醒目 */
+  margin-bottom: 10px;
+}
+
+footer{background:#222;text-align:center;padding:25px;color:#aaa;margin-top:50px}
+
+/* 移动端适配：小屏时上下堆叠，取消最小高度 */
+@media (max-width:768px){
+  .row {
+    flex-direction: column;
+  }
+  .col-left, .col-right {
+    min-height: auto; /* 小屏随内容自适应高度 */
+    padding: 30px 20px;
+  }
+  .video-wrap video {
+    min-height: auto;
+  }
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-box">
+    <div class="nav-left">
+      <a href="index1.html">首页</a>
+      <a href="about.html">关于我们</a>
+      <a href="news.html">傣医睡药床智能监测</a>
+      <a href="code.html">暖雅智能体</a>
+      <a href="product.html">产品服务</a>
+      <a href="contact.html">联系我们</a>
+    </div>
+    <button class="btn-login">登录 / 注册</button>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- 左右并排布局 -->
+  <div class="row">
+    <!-- 左侧：视频模块 -->
+    <div class="col-left">
+      <h2>关于我们</h2>
+      <div class="video-wrap">
+        <!-- 替换成你的视频地址 -->
+        <video src="AN.mp4" controls poster="video-cover.jpg">
+          你的浏览器不支持视频播放，请更换浏览器后重试
+        </video>
+      </div>
+      <p style="margin-top:15px;font-size:16px;line-height:1.8">
+        我们以国家级非物质文化遗产傣医睡药疗法为核心，融合物联网传感与智能温控技术，打造智能控温傣医睡药床，并配套自主研发的自适应网页监测系统。<br><br>
+        通过分区温度采集、AI智能体决策与多终端远程控制，实现传统睡药疗法的安全化、智能化与便捷化，契合“十五五”健康中国康养发展方向。项目结构清晰、成本可控，是学生团队可落地的民族医药+智能康养创新实践，致力于让传统康养技术更安全、更易用。
+
+      </p>
+    </div>
+
+    <!-- 右侧：理念模块 -->
+    <div class="col-right">
+      <h2>我们的理念</h2>
+      <p style="margin-top:15px;font-size:18px;line-height:2.0">
+        传承傣药精髓，创新智能理疗<br><br>
+        以用户健康为核心，用科技赋能传统医学<br><br>
+        专业、专注、专心，让每一次理疗都更安心<br><br>
+        守正不泥古，创新不离宗<br><br>
+        让傣医睡药疗法，服务更多健康需求者
+      </p>
+    </div>
+  </div>
+</div>
+
+<footer>© 傣药沙萃——基于暖雅（睡药疗法）网站平台 版权所有</footer>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>傣医睡药床 - 治疗完成</title>
+<style>
+/* 导航栏置顶核心样式（纯黑背景） */
+nav{
+  background:#333; /* 纯黑导航 */
+  padding:18px 30px;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:9999;
+  margin:0;
+}
+.nav-box{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.nav-left{display:flex;gap:30px;flex-wrap:wrap}
+nav a{color:#fff;text-decoration:none;font-size:16px}
+nav a:hover{color:#409eff}
+.btn-login{background:#409eff;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer}
+/* 页面基础样式（纯黑背景，预留导航空间） */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Microsoft YaHei", sans-serif;
+  background: #000; /* 纯黑页面背景，移除原背景图及混合效果 */
+  color: #333; /* 文字深灰，适配白色框体 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  padding-top: 90px;
+}
+/* 通用弹窗样式（白色框体） */
+.common-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff; /* 白色框体 */
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(255,255,255,0.2); /* 浅白阴影适配黑背景 */
+  z-index: 1000;
+  text-align: center;
+  opacity: 0;
+  animation: fadeInModal 0.4s ease-out forwards;
+  border: 1px solid #eee;
+}
+@keyframes fadeInModal {
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+@keyframes fadeOutModal {
+  to { opacity: 0; transform: translate(-50%, -50%) scale(0.95); visibility: hidden; }
+}
+/* 治疗结束提示弹窗 */
+.end-treatment-modal {
+  max-width: 420px;
+  animation: fadeInModal 0.4s ease-out forwards;
+}
+.end-treatment-modal p {
+  font-size: 20px;
+  color: #333; /* 深灰文字 */
+  margin: 10px 0;
+}
+/* 加载遮罩（白色框体） */
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff; /* 白色加载框 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  animation: 
+    showLoading 0s linear 4s forwards,
+    hideLoading 0.6s ease-out 7s forwards;
+  border: 1px solid #eee;
+  padding-top: 90px;
+}
+@keyframes showLoading {
+  to { opacity: 1; visibility: visible; }
+}
+@keyframes hideLoading {
+  to { opacity: 0; visibility: hidden; }
+}
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid #409eff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.loading-text {
+  font-size: 16px;
+  color: #666; /* 中灰文字 */
+}
+/* 核心弹窗容器（白色主框体） */
+.modal {
+  max-width: 900px;
+  width: 100%;
+  background: #fff; /* 白色核心框 */
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(255,255,255,0.2);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: fadeIn 0.4s ease-out 7.3s forwards;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  z-index: 1000;
+}
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 弹窗头部 */
+.modal-header {
+  background: #f8f9fa; /* 浅白头部，轻微区分 */
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #eee;
+}
+.header-text {
+  text-align: center;
+}
+.header-text h1 {
+  font-size: 20px;
+  color: #333; /* 深灰标题 */
+}
+.header-text p {
+  font-size: 14px;
+  color: #666; /* 中灰副标题 */
+  margin-top: 4px;
+}
+/* 弹窗内容 */
+.modal-body {
+  padding: 35px 40px;
+}
+.title {
+  text-align: center;
+  font-size: 24px;
+  color: #409eff; /* 主色标题 */
+  margin-bottom: 8px;
+}
+.subtitle {
+  text-align: center;
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 35px;
+}
+.section {
+  margin: 28px 0 15px;
+  font-size: 18px;
+  color: #409eff;
+  font-weight: bold;
+  border-left: 4px solid #409eff;
+  padding-left: 12px;
+}
+.item {
+  margin-bottom: 16px;
+  font-size: 16px;
+  line-height: 1.7;
+}
+.label {
+  font-weight: bold;
+  color: #666;
+  display: inline-block;
+  width: 145px;
+}
+.value {
+  color: #333;
+}
+.ok {
+  color: #409eff;
+  font-weight: bold;
+}
+.warn {
+  color: #66b1ff;
+  font-weight: bold;
+}
+/* 图表容器（浅白背景，适配白色框体） */
+.chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+.chart-box {
+  background: #f8f9fa; /* 浅白图表框 */
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #eee;
+}
+.chart-title {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+/* 底部按钮栏 */
+.modal-footer {
+  padding: 20px 40px;
+  background: #f8f9fa;
+  border-top: 1px solid #eee;
+  text-align: right;
+}
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+}
+.btn-primary {
+  background: #409eff;
+  color: #fff;
+}
+/* 上传成功弹窗 */
+.upload-modal {
+  max-width: 380px;
+  animation: fadeInModal 0.4s ease-out 9.3s forwards, fadeOutModal 0.4s ease-out 13.3s forwards;
+}
+.upload-modal p {
+  font-size: 17px;
+  color: #333;
+  margin: 10px 0;
+}
+/* 提交成功弹窗 */
+.success-modal {
+  max-width: 360px;
+  display: none;
+  background: #fff;
+  border: 1px solid #eee;
+}
+.success-modal.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+/* SVG图表样式（保留雷达图和疼痛变化图原始颜色，其余适配） */
+svg line, svg polyline, svg polygon {
+  stroke: #ccc !important; /* 浅灰坐标轴线条 */
+}
+svg text {
+  fill: #666 !important; /* 图表文字中灰 */
+}
+/* 保留疼痛变化图折线颜色：上次#3b82f6，本次#ef4444 */
+svg polyline[stroke="#3b82f6"],
+svg polygon[stroke="#3b82f6"] {
+  stroke: #3b82f6 !important;
+  fill: none !important;
+}
+svg polyline[stroke="#ef4444"],
+svg polygon[stroke="#ef4444"] {
+  stroke: #ef4444 !important;
+  fill: none !important;
+}
+/* 其他图表保留原有颜色 */
+svg rect[fill="#3b82f6"] {
+  fill: #3b82f6 !important;
+}
+svg rect[fill="#ef4444"] {
+  fill: #ef4444 !important;
+}
+svg circle[stroke="#f89c8f"],
+svg rect[fill="#f89c8f"],
+svg text[fill="#f89c8f"] {
+  stroke: #f89c8f !important;
+  fill: #f89c8f !important;
+}
+svg circle[stroke="#f9d16e"],
+svg rect[fill="#f9d16e"],
+svg text[fill="#f9d16e"] {
+  stroke: #f9d16e !important;
+  fill: #f9d16e !important;
+}
+svg circle[stroke="#8ea8d0"],
+svg rect[fill="#8ea8d0"],
+svg text[fill="#8ea8d0"] {
+  stroke: #8ea8d0 !important;
+  fill: #8ea8d0 !important;
+}
+/* 图表内部背景色适配 */
+svg circle[fill="#222"] {
+  fill: #f8f9fa !important; /* 适配浅白图表背景 */
+}
+/* 图片/svg自适应 */
+img, svg, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+</style>
+</head>
+<body>
+<!-- 导航栏（纯黑置顶） -->
+<nav>
+  <div class="nav-box">
+    <div class="nav-left">
+      <a href="index.html">首页</a>
+      <a href="about.html">关于我们</a>
+      <a href="news.html">傣医睡药床智能监测</a>
+      <a href="code.html">暖雅智能体</a>
+      <a href="product.html">产品服务</a>
+      <a href="contact.html">联系我们</a>
+    </div>
+    <button class="btn-login">登录 / 注册</button>
+  </div>
+</nav>
+<!-- 治疗结束弹窗（白色框） -->
+<div class="common-modal end-treatment-modal">
+  <p>⏰ 治疗时间已到</p>
+  <p>❄️ 正在降温</p>
+  <p>🔌 正在关闭机器</p>
+  <p>👨‍⚕️ 正在为您呼叫医生</p>
+</div>
+<!-- 加载遮罩（白色框） -->
+<div class="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">系统正在生成个人健康档案，请稍候...</div>
+</div>
+<!-- 核心健康档案弹窗（白色主框） -->
+<div class="modal">
+  <div class="modal-header">
+    <div class="header-text">
+      <h1>傣医睡药床智能康养系统</h1>
+      <p>治疗结束 · 自动生成个人健康档案</p>
+    </div>
+  </div>
+  <div class="modal-body">
+    <div class="title">傣医睡药床治疗完成</div>
+    <div class="subtitle">已为您生成本次治疗个人健康档案</div>
+    
+    <div class="section">患者基本信息</div>
+    <div class="item">
+      <span class="label">姓名：</span>
+      <span class="value">玉儿尖</span>
+    </div>
+    <div class="item">
+      <span class="label">年龄：</span>
+      <span class="value">52岁</span>
+    </div>
+    <div class="item">
+      <span class="label">既往病史：</span>
+      <span class="value">无高血压、无高血糖、无心脏病</span>
+    </div>
+    
+    <div class="section">治疗禁忌症与适应症</div>
+    <div class="item">
+      <span class="label">禁忌症：</span>
+      <span class="ok">无</span>
+    </div>
+    <div class="item">
+      <span class="label">适应症：</span>
+      <span class="warn">风湿、肩颈酸痛、膝关节不适</span>
+    </div>
+    
+    <div class="section">本次治疗记录</div>
+    <div class="item">
+      <span class="label">治疗时长：</span>
+      <span class="value">30分钟</span>
+    </div>
+    <div class="item">
+      <span class="label">重点部位：</span>
+      <span class="value">膝关节、肩颈关节</span>
+    </div>
+    <div class="item">
+      <span class="label">辅助部位：</span>
+      <span class="value">腰背、腿部整体升温</span>
+    </div>
+    
+    <div class="section">生命体征（治疗后）</div>
+    <div class="item">
+      <span class="label">心率：</span>
+      <span class="ok">72次/分（正常）</span>
+    </div>
+    <div class="item">
+      <span class="label">血压：</span>
+      <span class="ok">125/80 mmHg（正常）</span>
+    </div>
+    <div class="item">
+      <span class="label">呼吸：</span>
+      <span class="ok">18次/分（正常）</span>
+    </div>
+    
+    <div class="section">本次 vs 上次治疗对比</div>
+    <div class="chart-row">
+      <!-- 疼痛程度变化图（保留原始颜色：上次#3b82f6，本次#ef4444，数据趋势不变） -->
+      <div class="chart-box">
+        <div class="chart-title">疼痛程度变化（0-10分）</div>
+        <svg width="260" height="180" viewBox="0 0 260 180">
+          <text x="10" y="20" font-size="12">疼痛分</text>
+          <line x1="30" y1="150" x2="240" y2="150" stroke-width="1"/>
+          <line x1="30" y1="20" x2="30" y2="150" stroke-width="1"/>
+          <polyline points="30,120 80,100 130,90 180,80 230,70" stroke="#3b82f6" stroke-width="2" fill="none"/>
+          <polyline points="30,120 80,80 130,60 180,40 230,30" stroke="#ef4444" stroke-width="2" fill="none"/>
+          <text x="50" y="165" font-size="10">治疗前</text>
+          <text x="100" y="165" font-size="10">10min</text>
+          <text x="150" y="165" font-size="10">20min</text>
+          <text x="200" y="165" font-size="10">30min</text>
+          <text x="240" y="165" font-size="10">治疗后</text>
+          <text x="130" y="178" font-size="10">时间</text>
+          <text x="20" y="30" font-size="10" fill="#3b82f6">■ 上次</text>
+          <text x="80" y="30" font-size="10" fill="#ef4444">■ 本次</text>
+        </svg>
+        <p style="font-size:12px;color:#888;margin-top:8px">本次疼痛下降更快，降幅更显著</p>
+      </div>
+      
+      <!-- 身体功能恢复雷达图（保留原始颜色：上次#3b82f6，本次#ef4444，数据趋势不变） -->
+      <div class="chart-box">
+        <div class="chart-title">身体功能恢复雷达图</div>
+        <svg width="260" height="200" viewBox="0 0 260 200">
+          <polygon points="130,30 190,70 190,130 130,170 70,130 70,70" fill="none" stroke-width="1"/>
+          <polygon points="130,40 170,80 170,120 130,150 90,120 90,80" stroke="#3b82f6" fill="none" stroke-width="2"/>
+          <polygon points="130,50 180,90 180,110 130,140 80,110 80,90" stroke="#ef4444" fill="none" stroke-width="2"/>
+          <text x="125" y="25" font-size="10">灵活性</text>
+          <text x="200" y="80" font-size="10">活动度</text>
+          <text x="200" y="135" font-size="10">肌肉力量</text>
+          <text x="125" y="175" font-size="10">耐力</text>
+          <text x="50" y="135" font-size="10">平衡感</text>
+          <text x="50" y="80" font-size="10">关节舒适</text>
+          <text x="10" y="20" font-size="10" fill="#3b82f6">■ 上次</text>
+          <text x="80" y="20" font-size="10" fill="#ef4444">■ 本次</text>
+        </svg>
+        <p style="font-size:12px;color:#888;margin-top:8px">关节舒适、活动度提升最明显</p>
+      </div>
+      
+      <!-- 关键指标对比图（保留原有颜色） -->
+      <div class="chart-box">
+        <div class="chart-title">关键指标对比</div>
+        <svg width="260" height="180" viewBox="0 0 260 180">
+          <line x1="30" y1="150" x2="240" y2="150" stroke-width="1"/>
+          <text x="50" y="165" font-size="10">疼痛分</text>
+          <text x="110" y="165" font-size="10">活动度</text>
+          <text x="170" y="165" font-size="10">耐力</text>
+          <text x="230" y="165" font-size="10">平衡感</text>
+          <rect x="40" y="100" width="20" height="50" fill="#3b82f6"/>
+          <rect x="100" y="90" width="20" height="60" fill="#3b82f6"/>
+          <rect x="160" y="110" width="20" height="40" fill="#3b82f6"/>
+          <rect x="220" y="105" width="20" height="45" fill="#3b82f6"/>
+          <rect x="65" y="50" width="20" height="100" fill="#ef4444"/>
+          <rect x="125" y="50" width="20" height="100" fill="#ef4444"/>
+          <rect x="185" y="70" width="20" height="80" fill="#ef4444"/>
+          <rect x="245" y="60" width="20" height="90" fill="#ef4444"/>
+          <text x="10" y="20" font-size="10" fill="#3b82f6">■ 上次</text>
+          <text x="80" y="20" font-size="10" fill="#ef4444">■ 本次</text>
+        </svg>
+        <p style="font-size:12px;color:#888;margin-top:8px">疼痛显著降低，活动度大幅提升</p>
+      </div>
+      
+      <!-- 傣药吸收利用率图（保留原有颜色） -->
+      <div class="chart-box">
+        <div class="chart-title">傣药吸收利用率</div>
+        <svg width="260" height="240" viewBox="0 0 260 240">
+          <g font-size="11">
+            <rect x="10" y="10" width="14" height="10" fill="#f89c8f"/>
+            <text x="30" y="19">药物吸收 68%</text>
+            <rect x="100" y="10" width="14" height="10" fill="#f9d16e"/>
+            <text x="120" y="19">体表残留 22%</text>
+            <rect x="190" y="10" width="14" height="10" fill="#8ea8d0"/>
+            <text x="210" y="19">残渣处理 10%</text>
+          </g>
+          <circle cx="130" cy="130" r="65" fill="none" stroke="#f89c8f" stroke-width="30"/>
+          <circle cx="130" cy="130" r="65" fill="none" stroke="#f9d16e" stroke-width="30"
+            stroke-dasharray="89.6 28.6 12" stroke-dashoffset="89.6"/>
+          <circle cx="130" cy="130" r="65" fill="none" stroke="#8ea8d0" stroke-width="30"
+            stroke-dasharray="28.6 89.6 12" stroke-dashoffset="118.2"/>
+          <circle cx="130" cy="130" r="32" fill="#f8f9fa"/>
+          <line x1="130" y1="65" x2="130" y2="40" stroke="#f89c8f" stroke-width="1"/>
+          <text x="130" y="32" font-size="11" fill="#f89c8f" text-anchor="middle">药物吸收 68%</text>
+          <line x1="195" y1="120" x2="230" y2="120" stroke="#f9d16e" stroke-width="1"/>
+          <text x="240" y="123" font-size="11" fill="#f9d16e">体表残留 22%</text>
+          <line x1="130" y1="195" x2="130" y2="220" stroke="#8ea8d0" stroke-width="1"/>
+          <text x="130" y="230" font-size="11" fill="#8ea8d0" text-anchor="middle">残渣处理 10%</text>
+        </svg>
+        <p style="font-size:12px;color:#888;margin-top:8px">傣药渗透吸收良好，利用率达标</p>
+      </div>
+    </div>
+    
+    <div class="section">治疗结论与建议</div>
+    <div class="item">
+      <span class="label">治疗效果：</span>
+      <span class="ok">本次治疗较上次疼痛缓解更快，关节活动度、灵活性显著提升，整体康复效果更优</span>
+    </div>
+    <div class="item">
+      <span class="label">解决问题：</span>
+      <span class="value">有效缓解风湿、肩颈及膝关节酸痛，改善夜间睡眠与日常活动受限问题</span>
+    </div>
+    <div class="item">
+      <span class="label">待加强：</span>
+      <span class="warn">肌肉力量与耐力仍有提升空间，建议后续增加腰背肌群训练，配合傣药热敷巩固疗效</span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" onclick="submitSuccess()">确认并提交</button>
+  </div>
+</div>
+<!-- 上传成功弹窗（白色框） -->
+<div class="common-modal upload-modal">
+  <p>✅ 已自动上传到医院信息库</p>
+  <p>💾 用户小程序已保留本次治疗数据</p>
+</div>
+<!-- 提交成功弹窗（白色框） -->
+<div class="common-modal success-modal" id="successModal">
+  <p>✅ 提交成功</p>
+</div>
+
+<script>
+setTimeout(() => {
+  document.querySelector('.end-treatment-modal').style.animation = 'fadeOutModal 0.4s ease-out forwards';
+}, 4000);
+
+function submitSuccess() {
+  const modal = document.getElementById('successModal');
+  modal.classList.add('show');
+  setTimeout(() => {
+    modal.classList.remove('show');
+  }, 2000);
+}
+
+function manualUpload() {
+  const m = document.querySelector('.upload-modal');
+  m.style.animation = 'fadeInModal 0.4s ease-out forwards, fadeOutModal 0.4s ease-out 4s forwards';
+}
+</script>
+</body>
+</html>
